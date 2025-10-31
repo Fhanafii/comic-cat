@@ -312,7 +312,7 @@ view_comic() {
 
     local image_urls
     image_urls=$(fetch_images "$chapter_url")
-    download_images "$image_urls")
+    download_images "$image_urls"
     open_viewer
     echo "Done viewing $selected_chapter. Temporary images deleted."
   done
