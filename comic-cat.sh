@@ -226,9 +226,51 @@ handle_search_comics() {
   view_comic "$title"
 }
 
+# Load bookmarked comics
+load_bookmarks() {
+  if [ -f "bookmarks.json" ]; then
+    jq -r '.[]' bookmarks.json 2>/dev/null || echo ""
+  else
+    echo ""
+  fi
+}
+
+# Save bookmark
+save_bookmark() {
+  local title="$1"
+  local bookmarks_file="bookmarks.json"
+
+  if [ ! -f "$bookmarks_file" ]; then
+    echo "[]" > "$bookmarks_file"
+  fi
+
+  if jq -e ". | index(\"$title\")" "$bookmarks_file" >/dev/null 2>&1; then
+    echo "Comic already bookmarked."
+  else
+    jq ". + [\"$title\"]" "$bookmarks_file" > tmp.json && mv tmp.json "$bookmarks_file"
+    echo "Comic bookmarked."
+  fi
+}
+
 # Handle bookmarked comics
 handle_bookmarked_comics() {
-  echo "Bookmarked Comics feature not implemented yet."
+  local bookmarks
+  bookmarks=$(load_bookmarks)
+
+  if [ -z "$bookmarks" ]; then
+    echo "No bookmarked comics."
+    return
+  fi
+
+  local selected
+  selected=$(echo "$bookmarks" | fzf --reverse --prompt="Select Bookmarked Comic: " --height=80% --border)
+
+  if [ -z "$selected" ]; then
+    echo "No comic selected."
+    return
+  fi
+
+  view_comic "$selected"
 }
 
 # View comic (chapters, select, etc.)
