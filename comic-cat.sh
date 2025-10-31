@@ -279,27 +279,29 @@ view_comic() {
   local chapters
   chapters=$(fetch_chapters "$title")
 
-  local selected_data
-  selected_data=$(select_chapter "$chapters")
+  while true; do
+    local selected_data
+    selected_data=$(select_chapter "$chapters")
 
-  if [ -z "$selected_data" ]; then
-    return
-  fi
+    if [ -z "$selected_data" ]; then
+      break
+    fi
 
-  local selected_chapter
-  selected_chapter=$(echo "$selected_data" | cut -d"|" -f1)
-  local chapter_url
-  chapter_url=$(echo "$selected_data" | cut -d"|" -f2)
+    local selected_chapter
+    selected_chapter=$(echo "$selected_data" | cut -d"|" -f1)
+    local chapter_url
+    chapter_url=$(echo "$selected_data" | cut -d"|" -f2)
 
-  echo
-  echo "Selected: $selected_chapter"
-  echo
+    echo
+    echo "Selected: $selected_chapter"
+    echo
 
-  local image_urls
-  image_urls=$(fetch_images "$chapter_url")
-  download_images "$image_urls"
-  open_viewer
-  echo "Done! Temporary images deleted."
+    local image_urls
+    image_urls=$(fetch_images "$chapter_url")
+    download_images "$image_urls")
+    open_viewer
+    echo "Done viewing $selected_chapter. Temporary images deleted."
+  done
 }
 
 main() {
