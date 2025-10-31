@@ -2,14 +2,14 @@
 
 # ───────────────────────────────
 # comic-cat
-# Version: 1.0.0
+# Version: 1.1
 # Description: Fetch and view comics from KomikCast via terminal.
 # Author: You 😎
 # ──────────────────────────────
 
 SOURCE="https://komikcast03.com"
 TMP_DIR=""
-VERSION="1.0.0"
+VERSION="1.1"
 
 # Clean up temp files
 cleanup() {
@@ -195,14 +195,8 @@ fetch_latest_comics() {
 
 # Main menu
 show_menu() {
-  echo "Comic-Cat Menu:"
-  echo "1. List Comics (Latest Updates)"
-  echo "2. Search Comics"
-  echo "3. Bookmarked Comics"
-  echo "4. Exit"
-  echo
   read -p "Choose an option (1-4): " choice
-  choice=$(echo "$choice" | tr -d '\n')
+  choice=$(echo "$choice" | tr -d '[:space:]')
   echo "$choice"
 }
 
@@ -321,6 +315,12 @@ view_comic() {
 
 main() {
   while true; do
+    echo "Comic-Cat Menu:"
+    echo "1. List Comics (Latest Updates)"
+    echo "2. Search Comics"
+    echo "3. Bookmarked Comics"
+    echo "4. Exit"
+    echo
     local choice
     choice=$(show_menu)
 
