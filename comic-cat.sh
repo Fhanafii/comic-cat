@@ -202,6 +202,7 @@ show_menu() {
   echo "4. Exit"
   echo
   read -p "Choose an option (1-4): " choice
+  choice=$(echo "$choice" | tr -d '\n')
   echo "$choice"
 }
 
