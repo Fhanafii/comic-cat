@@ -82,17 +82,31 @@ fetch_chapters() {
 # Select a chapter
 select_chapter() {
   local chapters="$1"
+  local title="$2"
+
+  local options
+  options=$(echo "$chapters" | awk -F"|" '{print $1}')
+  options="$options\nBookmark this comic\nGo back to menu"
 
   local selected
-  selected=$(echo "$chapters" | awk -F"|" '{print $1}' | fzf --reverse --prompt="Select Chapter: " --height=80% --border)
+  selected=$(echo -e "$options" | fzf --reverse --prompt="Select Chapter: " --height=80% --border)
 
   if [ -z "$selected" ]; then
-    echo "No chapter selected."
-    exit 1
+    echo ""
+    return
+  fi
+
+  if [ "$selected" = "Bookmark this comic" ]; then
+    save_bookmark "$title"
+    echo ""
+    return
+  elif [ "$selected" = "Go back to menu" ]; then
+    echo ""
+    return
   fi
 
   local chapter_url
-  chapter_url=$(echo "$chapters" | grep "$selected" | cut -d"|" -f2)
+  chapter_url=$(echo "$chapters" | grep "^$selected|" | cut -d"|" -f2)
 
   echo "$selected|$chapter_url"
 }
@@ -281,7 +295,7 @@ view_comic() {
 
   while true; do
     local selected_data
-    selected_data=$(select_chapter "$chapters")
+    selected_data=$(select_chapter "$chapters" "$title")
 
     if [ -z "$selected_data" ]; then
       break
