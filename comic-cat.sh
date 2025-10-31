@@ -154,23 +154,136 @@ open_viewer() {
   fi
 }
 
-main() {
-  read -p "Enter comic title: " title
+# Fetch latest comics from homepage
+fetch_latest_comics() {
+  echo "Fetching latest comics..."
+  local html
+  html=$(curl -s -L -A "Mozilla/5.0" "$SOURCE")
 
+  if [ -z "$html" ]; then
+    echo "Failed to fetch homepage."
+    return 1
+  fi
+
+  local flat_html
+  flat_html=$(echo "$html" | tr -d '\n' | tr -d '\r')
+
+  local comics
+  comics=$(echo "$flat_html" | grep -oP '<a href="[^"]+/komik/[^"]+"[^>]*>[^<]+</a>' | sed -E 's|<a href="([^"]+)".*>([^<]+)</a>|\2|\1|' | head -20)
+
+  if [ -z "$comics" ]; then
+    echo "No comics found."
+    return 1
+  fi
+
+  echo "$comics"
+}
+
+# Main menu
+show_menu() {
+  echo "Comic-Cat Menu:"
+  echo "1. List Comics (Latest Updates)"
+  echo "2. Search Comics"
+  echo "3. Bookmarked Comics"
+  echo "4. Exit"
+  echo
+  read -p "Choose an option (1-4): " choice
+  echo "$choice"
+}
+
+# Handle list comics
+handle_list_comics() {
+  local comics
+  comics=$(fetch_latest_comics)
+
+  if [ $? -ne 0 ]; then
+    echo "Failed to fetch comics."
+    return
+  fi
+
+  local selected
+  selected=$(echo "$comics" | awk -F"|" '{print $1}' | fzf --reverse --prompt="Select Comic: " --height=80% --border)
+
+  if [ -z "$selected" ]; then
+    echo "No comic selected."
+    return
+  fi
+
+  local comic_url
+  comic_url=$(echo "$comics" | grep "^$selected|" | cut -d"|" -f2)
+
+  echo "Selected: $selected"
+  echo "URL: $comic_url"
+
+  # Extract title from URL or selected
+  local title="$selected"
+  view_comic "$title"
+}
+
+# Handle search comics
+handle_search_comics() {
+  read -p "Enter comic title: " title
+  view_comic "$title"
+}
+
+# Handle bookmarked comics
+handle_bookmarked_comics() {
+  echo "Bookmarked Comics feature not implemented yet."
+}
+
+# View comic (chapters, select, etc.)
+view_comic() {
+  local title="$1"
+  local chapters
   chapters=$(fetch_chapters "$title")
+
+  local selected_data
   selected_data=$(select_chapter "$chapters")
 
+  if [ -z "$selected_data" ]; then
+    return
+  fi
+
+  local selected_chapter
   selected_chapter=$(echo "$selected_data" | cut -d"|" -f1)
+  local chapter_url
   chapter_url=$(echo "$selected_data" | cut -d"|" -f2)
 
   echo
   echo "Selected: $selected_chapter"
   echo
 
+  local image_urls
   image_urls=$(fetch_images "$chapter_url")
   download_images "$image_urls"
   open_viewer
   echo "Done! Temporary images deleted."
+}
+
+main() {
+  while true; do
+    local choice
+    choice=$(show_menu)
+
+    case $choice in
+      1)
+        handle_list_comics
+        ;;
+      2)
+        handle_search_comics
+        ;;
+      3)
+        handle_bookmarked_comics
+        ;;
+      4)
+        echo "Exiting..."
+        exit 0
+        ;;
+      *)
+        echo "Invalid option. Please choose 1-4."
+        ;;
+    esac
+  done
 }
 
 main
