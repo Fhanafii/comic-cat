@@ -142,10 +142,13 @@ download_images() {
   local image_urls="$1"
   TMP_DIR=$(mktemp -d)
 
+  local total
+  total=$(echo "$image_urls" | wc -l)
   echo "Downloading all pages in order..."
   local i=1
 
   while read -r img; do
+    echo "Downloading page $i of $total..."
     local page
     page=$(printf "%03d" "$i")
     curl -s -L -A "Mozilla/5.0" -e "$SOURCE" -o "${TMP_DIR}/${page}.jpg" "$img"
