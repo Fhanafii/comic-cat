@@ -195,9 +195,26 @@ fetch_latest_comics() {
 
 # Main menu
 show_menu() {
-  read -p "Choose an option (1-4): " choice
-  choice=$(echo "$choice" | tr -d '[:space:]')
-  echo "$choice"
+  local options="List Comics (Latest Updates)\nSearch Comics\nBookmarked Comics\nExit"
+  local selected
+  selected=$(echo -e "$options" | fzf --reverse --prompt="Select Option: " --height=10 --border)
+  case "$selected" in
+    "List Comics (Latest Updates)")
+      echo "1"
+      ;;
+    "Search Comics")
+      echo "2"
+      ;;
+    "Bookmarked Comics")
+      echo "3"
+      ;;
+    "Exit")
+      echo "4"
+      ;;
+    *)
+      echo ""
+      ;;
+  esac
 }
 
 # Handle list comics
