@@ -170,7 +170,6 @@ open_viewer() {
 
 # Fetch latest comics from homepage
 fetch_latest_comics() {
-  echo "Fetching latest comics..."
   local html
   html=$(curl -s -L -A "Mozilla/5.0" "$SOURCE")
 
@@ -200,23 +199,7 @@ show_menu() {
   local options="List Comics (Latest Updates)\nSearch Comics\nBookmarked Comics\nExit"
   local selected
   selected=$(echo -e "$options" | fzf --reverse --prompt="Select Option: " --height=10 --border)
-  case "$selected" in
-    "List Comics (Latest Updates)")
-      echo "1"
-      ;;
-    "Search Comics")
-      echo "2"
-      ;;
-    "Bookmarked Comics")
-      echo "3"
-      ;;
-    "Exit")
-      echo "4"
-      ;;
-    *)
-      echo ""
-      ;;
-  esac
+  echo "$selected"
 }
 
 # Handle list comics
@@ -334,31 +317,25 @@ view_comic() {
 
 main() {
   while true; do
-    echo "Comic-Cat Menu:"
-    echo "1. List Comics (Latest Updates)"
-    echo "2. Search Comics"
-    echo "3. Bookmarked Comics"
-    echo "4. Exit"
-    echo
     local choice
     choice=$(show_menu)
 
     case $choice in
-      1)
+      "List Comics (Latest Updates)")
         handle_list_comics
         ;;
-      2)
+      "Search Comics")
         handle_search_comics
         ;;
-      3)
+      "Bookmarked Comics")
         handle_bookmarked_comics
         ;;
-      4)
+      "Exit")
         echo "Exiting..."
         exit 0
         ;;
       *)
-        echo "Invalid option. Please choose 1-4."
+        echo "Invalid option."
         ;;
     esac
   done
