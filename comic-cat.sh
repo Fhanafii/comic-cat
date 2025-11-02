@@ -183,7 +183,7 @@ fetch_latest_comics() {
   flat_html=$(echo "$html" | tr -d '\n' | tr -d '\r')
 
   local comics
-  comics=$(echo "$flat_html" | grep -oP '<a href="[^"]+/komik/[^"]+"[^>]*>[^<]+</a>' | sed -E 's|<a href="([^"]+)".*>([^<]+)</a>|\2|\1|' | head -20)
+  comics=$(echo "$flat_html" | grep -oP '<a class="series data-tooltip"[^>]*>.*?<h3>([^<]+)</h3>.*?</a>' | sed -E 's|<a class="series data-tooltip"[^>]*href="([^"]+)".*<h3>([^<]+)</h3>.*?</a>|\2|\1|' | head -20)
 
   if [ -z "$comics" ]; then
     echo "No comics found."
