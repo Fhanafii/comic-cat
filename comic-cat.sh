@@ -51,7 +51,7 @@ esac
 fetch_chapters() {
   local title="$1"
   local slug
-  slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g')
+  slug=$(echo "$title" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 ]//g' | sed 's/ /-/g')
   local comic_url="$SOURCE/komik/$slug/"
 
   echo
