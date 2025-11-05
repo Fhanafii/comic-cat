@@ -215,11 +215,14 @@ handle_list_comics() {
     return
   fi
 
-  local selected
-  selected=$(echo "$comics" | awk -F"|" '{print $1}' | fzf --reverse --prompt="Select Comic: " --height=80% --border)
+  local options
+  options=$(echo "$comics" | awk -F"|" '{print $1}')
+  options="$options\nGo back to menu"
 
-  if [ -z "$selected" ]; then
-    echo "No comic selected."
+  local selected
+  selected=$(echo -e "$options" | fzf --reverse --prompt="Select Comic: " --height=80% --border)
+
+  if [ -z "$selected" ] || [ "$selected" = "Go back to menu" ]; then
     return
   fi
 
@@ -276,11 +279,13 @@ handle_bookmarked_comics() {
     return
   fi
 
-  local selected
-  selected=$(echo "$bookmarks" | fzf --reverse --prompt="Select Bookmarked Comic: " --height=80% --border)
+  local options
+  options="$bookmarks\nGo back to menu"
 
-  if [ -z "$selected" ]; then
-    echo "No comic selected."
+  local selected
+  selected=$(echo -e "$options" | fzf --reverse --prompt="Select Bookmarked Comic: " --height=80% --border)
+
+  if [ -z "$selected" ] || [ "$selected" = "Go back to menu" ]; then
     return
   fi
 
